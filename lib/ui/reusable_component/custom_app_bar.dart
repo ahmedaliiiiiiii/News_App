@@ -8,7 +8,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
   final VoidCallback? onMenuPressed;
   final bool showMenuIcon;
-  final VoidCallback? onBackPressed; // دالة جديدة للتحكم في زر الرجوع
+  final VoidCallback? onBackPressed;
 
   const CustomAppBar({
     super.key,
@@ -17,7 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBackButton = false,
     this.onMenuPressed,
     this.showMenuIcon = false,
-    this.onBackPressed, // معامل جديد
+    this.onBackPressed,
   });
 
   @override
@@ -25,15 +25,25 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return AppBar(
-      backgroundColor: ColorManager.LightColor,
-      iconTheme: const IconThemeData(color: ColorManager.DarkColor),
+      backgroundColor: isDark
+          ? ColorManager.DarkColor
+          : ColorManager.LightColor,
+      surfaceTintColor: Colors.transparent,
+      iconTheme: IconThemeData(
+        color: isDark ? ColorManager.LightContrast : ColorManager.DarkContrast,
+      ),
       title: Text(
         title,
-        style: const TextStyle(
-          color: ColorManager.DarkColor,
+        style: TextStyle(
+          color: isDark
+              ? ColorManager.LightContrast
+              : ColorManager.DarkContrast,
           fontSize: 20,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
         ),
       ),
       centerTitle: true,
@@ -44,14 +54,27 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget? _buildLeading(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     if (showBackButton && onBackPressed != null) {
       return IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: onBackPressed, // استخدام الدالة المخصصة
+        icon: Icon(
+          Icons.arrow_back,
+          color: isDark
+              ? ColorManager.LightContrast
+              : ColorManager.DarkContrast,
+        ),
+        onPressed: onBackPressed,
       );
     } else if (showMenuIcon && onMenuPressed != null) {
       return IconButton(
-        icon: const Icon(Icons.menu_outlined),
+        icon: Icon(
+          Icons.menu_outlined,
+          color: isDark
+              ? ColorManager.LightContrast
+              : ColorManager.DarkContrast,
+        ),
         onPressed: onMenuPressed,
       );
     }

@@ -1,32 +1,34 @@
+// app_drawer.dart
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:news/ui/resources/assets_manager.dart';
+import 'package:news/ui/resources/color_manager.dart';
+import 'package:provider/provider.dart';
 
-import '../resources/assets_manager.dart';
-import '../resources/color_manager.dart';
+import '../style/theme_manager.dart';
 
 class AppDrawer extends StatelessWidget {
-  final String? selectedTheme;
   final String? selectedLanguage;
-  final List<String> themeOptions;
   final List<String> languageOptions;
-  final ValueChanged<String?> onThemeChanged;
   final ValueChanged<String?> onLanguageChanged;
 
   const AppDrawer({
     super.key,
-    required this.selectedTheme,
     required this.selectedLanguage,
-    required this.themeOptions,
     required this.languageOptions,
-    required this.onThemeChanged,
     required this.onLanguageChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    final themeManager = Provider.of<ThemeManager>(context);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Drawer(
+      width: MediaQuery.of(context).size.width * 0.7,
       elevation: 0,
       child: SafeArea(
         top: false,
@@ -35,13 +37,19 @@ class AppDrawer extends StatelessWidget {
             DrawerHeader(
               margin: EdgeInsets.zero,
               padding: EdgeInsets.zero,
-              decoration: const BoxDecoration(color: ColorManager.LightColor),
-              child: const Center(
+              decoration: BoxDecoration(
+                color: isDark
+                    ? ColorManager.DarkColor
+                    : ColorManager.LightColor,
+              ),
+              child: Center(
                 child: Text(
                   "News App",
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    color: ColorManager.DarkColor,
+                    color: isDark
+                        ? ColorManager.LightColor
+                        : ColorManager.DarkColor,
                     fontSize: 24,
                   ),
                 ),
@@ -49,45 +57,29 @@ class AppDrawer extends StatelessWidget {
             ),
             Expanded(
               child: Container(
-                color: ColorManager.DarkColor,
+                color: isDark
+                    ? ColorManager.DarkColor
+                    : ColorManager.LightColor,
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
                     _buildDrawerItem(
+                      context,
                       iconPath: AssetManager.HomeIcon,
                       title: 'Go To Home',
                       onTap: () => Navigator.pop(context),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Divider(
-                        color: ColorManager.LightColor,
-                        thickness: 2,
+                        color: isDark
+                            ? ColorManager.LightColor.withOpacity(0.2)
+                            : ColorManager.DarkColor.withOpacity(0.2),
+                        thickness: 1,
                       ),
                     ),
-                    // Theme Section with Dropdown
-                    _buildDropdownSection(
-                      iconPath: AssetManager.ThemeIcon,
-                      title: 'Theme',
-                      value: selectedTheme,
-                      options: themeOptions,
-                      onChanged: onThemeChanged,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Divider(
-                        color: ColorManager.LightColor,
-                        thickness: 2,
-                      ),
-                    ),
-                    // Language Section with Dropdown
-                    _buildDropdownSection(
-                      iconPath: AssetManager.LanguageIcon,
-                      title: 'Language',
-                      value: selectedLanguage,
-                      options: languageOptions,
-                      onChanged: onLanguageChanged,
-                    ),
+                    // Theme Toggle Section
+                    _buildThemeToggleSection(context, themeManager),
                   ],
                 ),
               ),
@@ -98,24 +90,30 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem({
+  Widget _buildDrawerItem(
+    BuildContext context, {
     required String iconPath,
     required String title,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return ListTile(
       leading: SvgPicture.asset(
         iconPath,
-        color: ColorManager.LightColor,
+        colorFilter: ColorFilter.mode(
+          isDark ? ColorManager.LightColor : ColorManager.DarkColor,
+          BlendMode.srcIn,
+        ),
         height: 20,
         width: 20,
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          fontFamily: "Inter",
+        style: TextStyle(
           fontWeight: FontWeight.w700,
-          color: ColorManager.LightColor,
+          color: isDark ? ColorManager.LightColor : ColorManager.DarkColor,
           fontSize: 20,
         ),
       ),
@@ -123,13 +121,13 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdownSection({
-    required String iconPath,
-    required String title,
-    required String? value,
-    required List<String> options,
-    required ValueChanged<String?> onChanged,
-  }) {
+  Widget _buildThemeToggleSection(
+    BuildContext context,
+    ThemeManager themeManager,
+  ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -138,49 +136,51 @@ class AppDrawer extends StatelessWidget {
           Row(
             children: [
               SvgPicture.asset(
-                iconPath,
-                color: ColorManager.LightColor,
+                AssetManager.ThemeIcon,
+                colorFilter: ColorFilter.mode(
+                  isDark ? ColorManager.LightColor : ColorManager.DarkColor,
+                  BlendMode.srcIn,
+                ),
                 height: 20,
                 width: 20,
               ),
               const SizedBox(width: 16),
               Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: "Inter",
+                'Theme',
+                style: TextStyle(
                   fontWeight: FontWeight.w700,
-                  color: ColorManager.LightColor,
+                  color: isDark
+                      ? ColorManager.LightColor
+                      : ColorManager.DarkColor,
                   fontSize: 20,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: ColorManager.DarkColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: ColorManager.LightColor),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: DropdownButton<String>(
-              value: value,
-              isExpanded: true,
-              dropdownColor: ColorManager.DarkColor,
-              icon: Icon(Icons.arrow_drop_down, color: ColorManager.LightColor),
-              underline: const SizedBox(),
-              style: const TextStyle(
-                color: ColorManager.LightColor,
-                fontSize: 16,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  themeManager.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                  style: TextStyle(
+                    color: isDark
+                        ? ColorManager.LightColor
+                        : ColorManager.DarkColor,
+                    fontSize: 16,
+                  ),
+                ),
               ),
-              onChanged: onChanged,
-              items: options.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
+              Switch(
+                value: themeManager.isDarkMode,
+                onChanged: (value) {
+                  themeManager.toggleTheme();
+                },
+                activeColor: isDark
+                    ? ColorManager.LightColor
+                    : ColorManager.DarkColor,
+              ),
+            ],
           ),
         ],
       ),

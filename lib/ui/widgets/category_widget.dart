@@ -1,16 +1,17 @@
+// category_widget.dart
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 
 import '../resources/color_manager.dart';
 
-class CategoryCard extends StatelessWidget {
+class CategoryWidget extends StatelessWidget {
   final String categoryName;
   final String imagePath;
   final String stats;
   final VoidCallback onPressed;
 
-  const CategoryCard({
+  const CategoryWidget({
     super.key,
     required this.categoryName,
     required this.imagePath,
@@ -20,11 +21,21 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Container(
-      height: 200,
+      height: screenHeight * 0.25,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: ColorManager.DarkColor,
+        borderRadius: BorderRadius.circular(20),
+        color: ColorManager.DarkContrast,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Stack(
         children: [
@@ -34,16 +45,20 @@ class CategoryCard extends StatelessWidget {
             top: 0,
             bottom: 0,
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.5,
+              width: screenWidth * 0.5,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  bottomLeft: Radius.circular(24),
+                  topLeft: Radius.circular(20),
+                  bottomLeft: Radius.circular(20),
                 ),
                 image: DecorationImage(
                   image: AssetImage(imagePath),
                   filterQuality: FilterQuality.high,
                   fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.3),
+                    BlendMode.darken,
+                  ),
                 ),
               ),
             ),
@@ -54,36 +69,43 @@ class CategoryCard extends StatelessWidget {
             top: 0,
             bottom: 0,
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.5,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(24),
-                  bottomRight: Radius.circular(24),
+              width: screenWidth * 0.5,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
                 ),
-                color: ColorManager.DarkColor,
+                color: ColorManager.DarkContrast,
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    ColorManager.DarkContrast.withOpacity(0.9),
+                    ColorManager.DarkContrast,
+                  ],
+                ),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       categoryName,
                       style: const TextStyle(
-                        color: ColorManager.LightColor,
+                        color: ColorManager.LightContrast,
                         fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       stats,
                       style: TextStyle(
-                        color: ColorManager.LightColor.withOpacity(0.7),
+                        color: ColorManager.LightContrast.withOpacity(0.8),
                         fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const Spacer(),
@@ -91,21 +113,23 @@ class CategoryCard extends StatelessWidget {
                       alignment: Alignment.bottomRight,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorManager.LightColor,
+                          backgroundColor: ColorManager.LightContrast,
+                          foregroundColor: ColorManager.DarkContrast,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(25),
                           ),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
+                            horizontal: 24,
+                            vertical: 14,
                           ),
+                          elevation: 2,
                         ),
                         onPressed: onPressed,
                         child: const Text(
                           "View All",
                           style: TextStyle(
-                            color: ColorManager.DarkColor,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
                           ),
                         ),
                       ),

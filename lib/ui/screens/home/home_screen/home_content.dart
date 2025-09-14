@@ -1,57 +1,63 @@
 import 'package:flutter/material.dart';
 
-import '../home/categories/business_news_screen.dart';
-import '../home/categories/entertainment_news_screen.dart';
-import '../home/categories/general_news_screen.dart';
-import '../home/categories/sports_news_screen.dart';
-import '../home/categories/technology_news_screen.dart';
-import '../resources/color_manager.dart';
-import 'category_card.dart';
-import 'news_category.dart';
+import '../../../resources/caretory_model.dart';
+import '../../../resources/color_manager.dart';
+import '../../../widgets/category_widget.dart';
+import '../categories/business_news_screen.dart';
+import '../categories/entertainment_news_screen.dart';
+import '../categories/general_news_screen.dart';
+import '../categories/sports_news_screen.dart';
+import '../categories/technology_news_screen.dart';
 
 class HomeContent extends StatelessWidget {
-  final List<NewsCategory> categories;
+  final List<CategoryModel> categories;
 
   const HomeContent({super.key, required this.categories});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 16),
-          const Text(
+          const SizedBox(height: 24),
+          Text(
             "Good Morning",
             style: TextStyle(
-              color: ColorManager.DarkColor,
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
+              color: isDark
+                  ? ColorManager.LightContrast
+                  : ColorManager.DarkContrast,
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              height: 1.2,
             ),
           ),
-          const Text(
+          const SizedBox(height: 4),
+          Text(
             "Here is Some News For You",
             style: TextStyle(
-              color: ColorManager.DarkColor,
-              fontSize: 24,
+              color: isDark ? ColorManager.GreyLight : ColorManager.GreyMedium,
+              fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Expanded(
             child: ListView.separated(
               physics: const BouncingScrollPhysics(),
               itemCount: categories.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              separatorBuilder: (context, index) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
-                return CategoryCard(
-                  categoryName: categories[index].name,
-                  imagePath: categories[index].image,
-                  stats: " ", // Fixed: Use actual stats
-                  onPressed: () {
-                    _navigateToCategory(context, categories[index].name);
-                  },
+                final category = categories[index];
+                return CategoryWidget(
+                  categoryName: category.name,
+                  imagePath: category.imagePath,
+                  stats: " ",
+                  onPressed: () => _navigateToCategory(context, category),
                 );
               },
             ),
@@ -61,8 +67,8 @@ class HomeContent extends StatelessWidget {
     );
   }
 
-  void _navigateToCategory(BuildContext context, String category) {
-    switch (category.toLowerCase()) {
+  void _navigateToCategory(BuildContext context, CategoryModel category) {
+    switch (category.id) {
       case 'general':
         Navigator.push(
           context,
